@@ -1,0 +1,1041 @@
+/*
+  =============================================
+  style.css — Union Tailors Order Manager
+  =============================================
+
+  PURPOSE:
+    ALL visual styling lives here.
+    No colors or fonts exist in any other file.
+
+  HOW IT IS ORGANIZED:
+    1. CSS Variables   — colors and sizes used everywhere
+    2. Reset           — remove default browser styles
+    3. Loading Screen  — spinner shown on startup
+    4. Login Screen    — email/password form
+    5. Setup Screen    — shown when Firebase not configured
+    6. Header          — top red bar
+    7. Stats Bar       — numbers (total, working, ready, revenue)
+    8. Search & Filter — search box and status dropdown
+    9. Order Cards     — cards in the list view
+   10. Detail View     — full order info screen
+   11. Form Screen     — new/edit order form
+   12. Print Styles    — what the printed slip looks like
+   13. Badges          — status labels (Pending, Ready etc.)
+   14. Buttons         — all button styles
+   15. Utilities       — small helpers
+*/
+
+
+/* =============================================
+   1. CSS VARIABLES
+   Define colors and sizes once, use everywhere.
+   To change the app's color, just edit --primary.
+   ============================================= */
+:root {
+  --primary:        #8B1A1A;  /* Union Tailors dark red */
+  --primary-hover:  #a01f1f;
+  --primary-shadow: rgba(139, 26, 26, 0.3);
+
+  --bg:             #f5f4f0;  /* Off-white page background */
+  --white:          #ffffff;
+  --border:         #e8e6e0;
+  --border-dark:    #d0cdc8;
+
+  --text:           #1a1a1a;  /* Main text color */
+  --text-muted:     #888888;  /* Secondary / hint text */
+  --text-light:     #bbbbbb;
+
+  --green:          #166534;
+  --green-bg:       #dcfce7;
+  --orange:         #e67e22;
+  --red:            #dc2626;
+  --red-bg:         #fee2e2;
+
+  --radius-sm:   6px;
+  --radius-md:   8px;
+  --radius-lg:  12px;
+  --radius-xl:  16px;
+}
+
+
+/* =============================================
+   2. RESET
+   Remove default browser styles so our app
+   looks the same on all browsers and phones.
+   ============================================= */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent; /* Remove blue flash on tap in Android */
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* All inputs, selects, and textareas share the same base style */
+input, select, textarea {
+  font-family: inherit;
+  font-size: 14px;
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--white);
+  color: var(--text);
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius-md);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-shadow);
+}
+
+/* Remove arrows from number inputs */
+input[type="number"] { -moz-appearance: textfield; }
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+a { color: var(--primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+
+/* =============================================
+   3. LOADING SCREEN
+   Shown while JavaScript and Firebase load.
+   ============================================= */
+.loading-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 16px;
+  color: var(--text-muted);
+}
+
+/* Spinning circle animation */
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+
+/* =============================================
+   4. LOGIN SCREEN
+   Email / password sign in and sign up form.
+   ============================================= */
+.login-page {
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.login-logo {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.login-logo h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: 0.5px;
+}
+
+.login-logo p {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.login-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 28px 24px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+}
+
+.login-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.login-tab {
+  flex: 1;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  border-bottom: 2.5px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.login-tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 5px;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+}
+
+.error-msg {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: var(--red-bg);
+  color: var(--red);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  border: 1px solid #fca5a5;
+}
+
+.success-msg {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: var(--green-bg);
+  color: var(--green);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+}
+
+
+/* =============================================
+   5. SETUP SCREEN
+   Shown when Firebase config is not filled in yet.
+   ============================================= */
+.setup-page {
+  padding: 24px 16px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.setup-page h2 {
+  font-size: 20px;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+
+.setup-steps {
+  margin: 20px 0;
+  counter-reset: step;
+}
+
+.setup-step {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 16px;
+  padding: 14px;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+}
+
+.step-number {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-weight: 700;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.step-content h4 {
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.step-content p {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.code-block {
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  background: #1a1a1a;
+  color: #4ade80;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  margin-top: 8px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+
+/* =============================================
+   6. HEADER
+   The sticky dark red top bar with app name.
+   ============================================= */
+.header {
+  background: var(--primary);
+  color: white;
+  padding: 13px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px var(--primary-shadow);
+}
+
+.header-title h1 {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.header-title p {
+  font-size: 11px;
+  opacity: 0.7;
+  margin-top: 1px;
+}
+
+.header-btn {
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.18);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+/* Smaller back button style */
+.back-btn {
+  padding: 7px 12px;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+
+/* =============================================
+   7. STATS BAR
+   The row of 4 numbers at the top of order list.
+   ============================================= */
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-bottom: 1px solid var(--border);
+}
+
+.stat-cell {
+  text-align: center;
+  padding: 11px 4px;
+  background: var(--white);
+  border-right: 1px solid var(--border);
+}
+
+.stat-cell:last-child { border-right: none; }
+
+.stat-value {
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 1px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+
+/* =============================================
+   8. SEARCH & FILTER BAR
+   ============================================= */
+.search-bar {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+}
+
+.search-bar input {
+  flex: 1;
+}
+
+.search-bar select {
+  width: auto;
+  min-width: 95px;
+  padding: 10px 8px;
+}
+
+
+/* =============================================
+   9. ORDER CARDS
+   Each order shown as a card in the list.
+   ============================================= */
+.orders-list {
+  padding: 8px 10px;
+}
+
+.order-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 8px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.order-card:active {
+  transform: scale(0.99);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.card-body {
+  padding: 13px 15px;
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 6px;
+}
+
+.card-name {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.card-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+.card-amount {
+  text-align: right;
+}
+
+.card-total {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.card-due {
+  font-size: 11px;
+  color: var(--orange);
+  font-weight: 500;
+}
+
+.card-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-garments {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 50px 20px;
+  color: var(--text-light);
+}
+
+.empty-state .empty-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+
+.empty-state h3 {
+  font-size: 16px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.empty-state p {
+  font-size: 13px;
+}
+
+
+/* =============================================
+   10. DETAIL VIEW
+   Screen showing one order's full information.
+   ============================================= */
+.detail-page {
+  min-height: 100vh;
+  background: var(--bg);
+  padding-bottom: 20px;
+}
+
+.status-bar {
+  background: var(--white);
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.status-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Sections inside the detail view */
+.info-section {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 15px 16px;
+  margin: 8px 10px 0;
+}
+
+.section-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.info-item label {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.info-item span {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* Payment table inside detail view */
+.payment-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.payment-table th {
+  text-align: left;
+  padding: 4px 0 8px;
+  font-weight: 500;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.payment-table th:last-child { text-align: right; }
+
+.payment-table td {
+  padding: 7px 0;
+  border-bottom: 0.5px solid var(--bg);
+}
+
+.payment-table td:last-child { text-align: right; }
+
+.payment-total {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--primary);
+}
+
+/* Measurement badges grid */
+.measure-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+}
+
+.measure-badge {
+  background: var(--bg);
+  padding: 7px 9px;
+  border-radius: var(--radius-md);
+}
+
+.measure-badge label {
+  display: block;
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.measure-badge span {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.measure-subsection {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-light);
+  margin-bottom: 7px;
+  text-transform: uppercase;
+}
+
+.notes-box {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: #fffbf0;
+  border-radius: var(--radius-md);
+  border: 1px solid #f0e8c8;
+  font-size: 13px;
+}
+
+.notes-box span { color: var(--text-muted); }
+
+/* Action buttons at bottom of detail */
+.detail-actions {
+  padding: 14px 10px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+
+/* =============================================
+   11. FORM SCREEN
+   New order / Edit order form.
+   ============================================= */
+.form-page {
+  min-height: 100vh;
+  background: var(--bg);
+  padding-bottom: 80px; /* Space for sticky save button */
+}
+
+/* Tab bar: Details | Measurements */
+.tab-bar {
+  display: flex;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 50px;
+  z-index: 90;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  border-bottom: 2.5px solid transparent;
+  font-family: inherit;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.tab-btn.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+/* Each form section (Customer, Dates, Garments, etc.) */
+.form-section {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 15px 16px;
+  margin: 10px 10px 0;
+}
+
+.form-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.field-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+}
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.grid-3-measure { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+
+/* Garment item row */
+.garment-item {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+/* Repeat customer alert */
+.repeat-customer-alert {
+  padding: 10px 12px;
+  background: #FEF3C7;
+  border-radius: var(--radius-md);
+  border: 1px solid #FDE68A;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.repeat-customer-alert span { color: #92400E; font-weight: 500; }
+
+/* Payment totals inside form */
+.payment-summary {
+  margin-top: 12px;
+  padding: 12px;
+  background: var(--bg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.payment-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.payment-row span:first-child { color: var(--text-muted); }
+.payment-row span:last-child { font-weight: 600; }
+
+.advance-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.advance-row label {
+  font-size: 13px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.advance-row input { max-width: 110px; }
+
+.balance-display {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  white-space: nowrap;
+}
+
+/* Sticky Save button at the bottom of the form */
+.sticky-save {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 16px;
+  background: var(--white);
+  border-top: 1px solid var(--border);
+  z-index: 200;
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.measure-hint {
+  font-size: 11px;
+  color: var(--text-light);
+  margin-bottom: 12px;
+}
+
+
+/* =============================================
+   12. PRINT STYLES
+   What the order slip looks like when printed.
+   No colors, clean black and white layout.
+   ============================================= */
+.print-page {
+  padding: 12px;
+  background: var(--bg);
+  min-height: 100vh;
+}
+
+/* The actual slip that gets printed */
+#print-slip {
+  font-family: Georgia, serif;
+  color: #111;
+  background: white;
+  border: 2px solid var(--primary);
+  border-radius: 10px;
+  padding: 20px;
+  max-width: 340px;
+  margin: 0 auto;
+}
+
+.slip-header { text-align: center; margin-bottom: 12px; }
+.slip-title { color: var(--primary); font-weight: 700; font-size: 26px; letter-spacing: 1.5px; }
+.slip-address { font-size: 11px; color: #555; margin-top: 3px; }
+
+.slip-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  font-size: 12.5px;
+  margin-bottom: 10px;
+}
+
+.slip-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.slip-table th {
+  text-align: left;
+  padding: 4px 0 6px;
+  border-bottom: 1px solid #bbb;
+}
+
+.slip-table th:last-child { text-align: right; }
+
+.slip-table td {
+  padding: 5px 0;
+  border-bottom: 0.5px solid #eee;
+}
+
+.slip-table td:last-child { text-align: right; }
+
+.slip-totals {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #bbb;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  row-gap: 4px;
+  font-size: 12.5px;
+}
+
+.slip-totals span:last-child { text-align: right; }
+.slip-balance { font-weight: 700 !important; }
+
+.slip-footer {
+  text-align: right;
+  font-size: 10px;
+  color: #aaa;
+  margin-top: 14px;
+}
+
+.slip-note {
+  margin-top: 10px;
+  font-size: 10.5px;
+  color: #666;
+  border-top: 1px solid #eee;
+  padding-top: 6px;
+}
+
+/* Hide UI buttons when printing */
+@media print {
+  .no-print { display: none !important; }
+  body { background: white; }
+  #print-slip {
+    border: 2px solid #8B1A1A !important;
+    margin: 0 auto;
+    box-shadow: none;
+  }
+}
+
+.print-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  max-width: 340px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+/* =============================================
+   13. BADGES (Status labels)
+   ============================================= */
+.badge {
+  display: inline-block;
+  padding: 4px 11px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+
+/* =============================================
+   14. BUTTONS
+   ============================================= */
+
+/* Primary button — dark red, filled */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.15s, transform 0.1s;
+  border: none;
+}
+
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Filled red — for primary actions like Save, Print */
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover { background: var(--primary-hover); }
+
+/* Outlined red — for secondary actions like Edit, Back */
+.btn-outline {
+  background: transparent;
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+}
+
+/* Green — for WhatsApp button */
+.btn-green {
+  background: var(--green-bg);
+  color: var(--green);
+  border: 1px solid #86efac;
+}
+
+/* Red — for Delete button */
+.btn-danger {
+  background: var(--red-bg);
+  color: var(--red);
+  border: 1px solid #fca5a5;
+}
+
+/* Small button size */
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+/* Full width button */
+.btn-block {
+  width: 100%;
+  padding: 13px;
+  font-size: 15px;
+  border-radius: var(--radius-lg);
+}
+
+/* Ghost / text button — no background */
+.btn-ghost {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 13px;
+  padding: 4px 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* Text link button */
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--primary);
+  cursor: pointer;
+  font-size: 13px;
+  font-family: inherit;
+  text-decoration: underline;
+}
+
+
+/* =============================================
+   15. UTILITIES
+   ============================================= */
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+
+/* Divider line */
+hr.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 10px 0;
+}
